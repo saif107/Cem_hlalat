@@ -1,60 +1,82 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المجلة المدرسية - العدد الأول</title>
-    <!-- إضافة مكتبة 3D FlipBook -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/3d-flip-book/css/flipbook.style.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/3d-flip-book/js/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/3d-flip-book/js/flipbook.min.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            text-align: center;
-        }
-        h1, h2, h3 {
-            margin: 0;
-            padding: 10px;
-        }
-        #bookContainer {
-            width: 80%;
-            height: 90%;
-            margin: 20px auto;
-        }
-        footer {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #555;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>مجلة المدرسة</title>
+  <script src="https://cdn.jsdelivr.net/npm/dearflip@2.1.0/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dearflip@2.1.0/dist/dearflip.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dearflip@2.1.0/dist/dearflip.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background: #004d7a;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header h2 {
+      margin: 5px 0;
+      font-size: 20px;
+    }
+
+    header h3 {
+      margin: 5px 0;
+      font-size: 18px;
+      color: #ffd700;
+    }
+
+    #flipbookContainer {
+      flex: 1;
+    }
+
+    footer {
+      text-align: center;
+      background: #333;
+      color: white;
+      padding: 10px;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-    <!-- العنوان الرئيسي -->
-    <h1>متوسطة الشهداء رزيق - برهوم</h1>
-    <!-- العنوان الفرعي -->
-    <h2>المجلة المدرسية - العدد الأول</h2>
-    <h3>أحفاد نوفمبر</h3>
-    <!-- حاوية عرض الكتاب -->
-    <div id="bookContainer"></div>
-    <!-- التوقيع في الأسفل -->
-    <footer>برمجة وتصميم الأستاذ حوض سيف الدين</footer>
 
-    <script>
-        $(document).ready(function () {
-            $('#bookContainer').FlipBook({
-                pdf: 'Magazine_hlalat.pdf', // اسم ملف PDF الخاص بك
-                style: 'light',
-                pageMode: 'double', // عرض صفحة واحدة أو مزدوجة (single أو double)
-                soundEnable: true,  // تمكين صوت تقليب الصفحات
-                controlsProps: {
-                    downloadEnable: false, // تعطيل زر التنزيل
-                    fullscreenEnable: true // تمكين زر ملء الشاشة
-                }
-            });
-        });
-    </script>
+<header>
+  <h1>متوسطة الشهداء رزيق</h1>
+  <h2>المجلة المدرسية - العدد الأول أفريل 2025</h2>
+  <h3>أحفاد نوفمبر</h3>
+</header>
+
+<div id="flipbookContainer" class="df-flipbook" source="Magazine_hlalat.pdf"></div>
+
+<footer>
+  برمجة 2و تصميم الأستاذ حوض سيف الدين
+</footer>
+
+<script>
+  dFlipReady(function () {
+    new DFLIP({
+      source: "Magazine_hlalat.pdf",
+      webgl: true,
+      backgroundColor: "#e0e0e0",
+      height: "100%",
+      width: "100%"
+    }, "#flipbookContainer");
+  });
+</script>
+
 </body>
 </html>
