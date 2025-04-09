@@ -3,26 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Viewer</title>
+    <title>PDF Flipbook Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4/turn.min.js"></script>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: Arial, sans-serif;
+            text-align: center;
             margin: 0;
             background-color: #f4f4f4;
         }
-        iframe {
+
+        #flipbook {
             width: 80%;
-            height: 90%;
-            border: none;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            height: 500px;
+            margin: 20px auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
-    <!-- استبدل 'your-file.pdf' بالاسم الفعلي لملف PDF في مستودعك -->
-    <iframe src="Magazine_hlalat.pdf" allowfullscreen></iframe>
+    <h1>عرض الكتاب بتقليب الصفحات</h1>
+    <div id="flipbook"></div>
+
+    <script>
+        const pdfUrl = "Magazine_hlalat.pdf"; // اسم ملف PDF الخاص بك
+
+        async function loadPDF() {
+            const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+            const flipbook = document.getElementById('flipbook');
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 2 });
+
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                const pageDiv = document.createElement('div');
+                pageDiv.style.width = viewport.width + "px";
+                pageDiv.style.height = viewport.height + "px";
+                pageDiv.appendChild(canvas);
+
+                flipbook.appendChild(pageDiv);
+            }
+
+            // Initialize Turn.js
+            $(flipbook).turn({
+                width: 800,
+                height: 600,
+                autoCenter: true
+            });
+        }
+
+        loadPDF();
+    </script>
 </body>
 </html>
