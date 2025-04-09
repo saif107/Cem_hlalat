@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>متوسطة الشهداء رزيق</title>
-  <script src="https://dearflip.com/wp-content/plugins/3d-flipbook-dflip/assets/js/dflip.min.js"></script>
-  <link rel="stylesheet" href="https://dearflip.com/wp-content/plugins/3d-flipbook-dflip/assets/css/dflip.min.css">
   <style>
     body {
       margin: 0;
@@ -26,11 +24,10 @@
       color: #555;
       font-size: 14px;
     }
-    #flipbookContainer {
-      width: 90%;
-      max-width: 900px;
-      margin: 20px auto;
+    iframe {
+      width: 80%;
       height: 600px;
+      border: none;
     }
   </style>
 </head>
@@ -39,15 +36,9 @@
   <h2>المجلة المدرسية - العدد الأول أفريل 2025</h2>
   <h2>أحفاد نوفمبر</h2>
 
-  <div id="flipbookContainer">
-    <div class="df-flipbook" 
-         source="https://drive.google.com/uc?export=download&id=1pEmjkyxXDfajkFQfN0_TlOEVhnCmOxi8"
-         id="my-flipbook"
-         webgl="true"
-         backgroundcolor="#ffffff"
-         height="100%">
-    </div>
-  </div>
+  <!-- استخدام Google Docs Viewer لعرض الـ PDF -->
+  <iframe src="https://docs.google.com/viewer?url=https://drive.google.com/uc?export=download&id=1pEmjkyxXDfajkFQfN0_TlOEVhnCmOxi8&embedded=true" 
+          frameborder="0"></iframe>
 
   <div class="footer">
     برمجة و تصميم الأستاذ حوض سيف الدين
