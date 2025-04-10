@@ -1,146 +1,249 @@
-// PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+// إعداد عامل PDF.js
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-// PDF file path - make sure this matches your file location exactly
-const pdfPath = './2030.pdf';
+// المتغيرات
 let pdfDoc = null;
-let pageCount = 0;
+let pageNum = 1;
+let pageRendering = false;
+let pageNumPending = null;
+let scale = 1.5;
+const flipbook = document.getElementById('flipbook');
+const pageNumDisplay = document.getElementById('page-num');
+const pageCountDisplay = document.getElementById('page-count');
+const loadingOverlay = document.getElementById('loading-overlay');
+const pageTurnShadow = document.querySelector('.page-turn-shadow');
 
-// Load the PDF with better error handling
+// تحميل ملف PDF باستخدام طرق متعددة للتوافق مع مختلف الأجهزة
 function loadPDF() {
-    console.log('Attempting to load PDF from:', pdfPath);
+    console.log('بدء محاولة تحميل PDF...');
     
-    // Create a fetch request to check if the file exists
-    fetch(pdfPath)
+    // محاولة تحميل الملف باستخدام fetch أولاً (أكثر توافقًا مع المتصفحات الحديثة)
+    fetch('2030.pdf')
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
+                throw new Error(`فشل في جلب الملف: ${response.status} ${response.statusText}`);
             }
+            console.log('تم جلب الملف بنجاح باستخدام fetch');
             return response.arrayBuffer();
         })
         .then(arrayBuffer => {
-            return pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        })
-        .then(pdf => {
-            console.log('PDF loaded successfully');
-            pdfDoc = pdf;
-            pageCount = pdf.numPages;
-            console.log('Number of pages:', pageCount);
-            
-            // Initialize the flipbook after loading the PDF
-            initializeFlipbook();
+            processPdfData(arrayBuffer);
         })
         .catch(error => {
-            console.error('Error loading PDF:', error);
-            alert('حدث خطأ أثناء تحميل ملف PDF: ' + error.message);
+            console.warn('فشل تحميل PDF باستخدام fetch، جاري المحاولة بطريقة أخرى:', error);
+            
+            // محاولة ثانية باستخدام XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '2030.pdf', true);
+            xhr.responseType = 'arraybuffer';
+            
+            xhr.onload = function() {
+                if (this.status === 200) {
+                    console.log('تم تحميل الملف بنجاح باستخدام XMLHttpRequest');
+                    processPdfData(this.response);
+                } else {
+                    console.error('فشل في تحميل PDF باستخدام XMLHttpRequest:', this.status, this.statusText);
+                    
+                    // محاولة ثالثة باستخدام مسار مطلق
+                    tryAlternativePaths();
+                }
+            };
+            
+            xhr.onerror = function() {
+                console.error('خطأ في الشبكة أثناء تحميل PDF باستخدام XMLHttpRequest');
+                tryAlternativePaths();
+            };
+            
+            xhr.send();
         });
 }
 
-function initializeFlipbook() {
-    const flipbook = document.getElementById('flipbook');
+// محاولة تحميل الملف من مسارات بديلة
+function tryAlternativePaths() {
+    console.log('محاولة تحميل الملف من مسارات بديلة...');
     
-    // Create pages for the flipbook
-    for (let i = 1; i <= pageCount; i++) {
+    // قائمة بالمسارات البديلة المحتملة
+    const alternativePaths = [
+        './2030.pdf',
+        '../2030.pdf',
+        '/2030.pdf',
+        'file:///c:/Users/SiFO-PC/Desktop/مشروع/2030.pdf',
+        window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '2030.pdf'
+    ];
+    
+    // محاولة تحميل الملف من كل مسار بديل
+    tryNextPath(alternativePaths, 0);
+}
+
+// محاولة تحميل الملف من المسار التالي في القائمة
+function tryNextPath(paths, index) {
+    if (index >= paths.length) {
+        // فشلت جميع المحاولات
+        console.error('فشلت جميع محاولات تحميل الملف');
+        alert('فشل في تحميل ملف PDF. الرجاء التأكد من وجود الملف في المسار الصحيح.');
+        loadingOverlay.style.display = 'none';
+        return;
+    }
+    
+    console.log('محاولة تحميل الملف من المسار:', paths[index]);
+    
+    fetch(paths[index])
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`فشل في جلب الملف: ${response.status} ${response.statusText}`);
+            }
+            console.log('تم جلب الملف بنجاح من المسار البديل:', paths[index]);
+            return response.arrayBuffer();
+        })
+        .then(arrayBuffer => {
+            processPdfData(arrayBuffer);
+        })
+        .catch(error => {
+            console.warn(`فشل تحميل PDF من المسار ${paths[index]}:`, error);
+            // محاولة المسار التالي
+            tryNextPath(paths, index + 1);
+        });
+}
+
+// معالجة بيانات PDF بعد تحميلها بنجاح
+function processPdfData(arrayBuffer) {
+    // تحميل PDF باستخدام PDF.js
+    pdfjsLib.getDocument({data: arrayBuffer}).promise
+        .then(function(pdf) {
+            console.log('تم تحميل ملف PDF بنجاح');
+            pdfDoc = pdf;
+            pageCountDisplay.textContent = pdf.numPages;
+            
+            // إنشاء صفحات للكتاب
+            createPages(pdf.numPages);
+            
+            // تهيئة turn.js
+            initTurn();
+            
+            // عرض الصفحة الأولى
+            renderPage(1);
+            
+            // إخفاء شاشة التحميل
+            setTimeout(() => {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+            }, 1000);
+        })
+        .catch(function(error) {
+            console.error('خطأ في تحميل PDF باستخدام PDF.js:', error);
+            alert('خطأ في تحميل ملف PDF: ' + error.message);
+            loadingOverlay.style.display = 'none';
+        });
+}
+
+// إنشاء صفحات للكتاب
+function createPages(numPages) {
+    flipbook.innerHTML = ''; // مسح أي محتوى موجود
+    
+    for (let i = 1; i <= numPages; i++) {
         const pageDiv = document.createElement('div');
         pageDiv.className = 'page';
         pageDiv.dataset.pageNumber = i;
+        
+        // إضافة canvas لكل صفحة
+        const canvas = document.createElement('canvas');
+        canvas.id = 'page-' + i;
+        pageDiv.appendChild(canvas);
+        
         flipbook.appendChild(pageDiv);
     }
-    
-    // Initialize turn.js
+}
+
+// تهيئة turn.js مع تأثيرات إضافية
+function initTurn() {
     $(flipbook).turn({
         width: flipbook.clientWidth,
         height: flipbook.clientHeight,
         autoCenter: true,
-        display: 'double',
+        display: 'double', // تغيير إلى عرض صفحتين
         acceleration: true,
         elevation: 50,
         gradients: true,
+        duration: 1000, // مدة أطول للتأثير
         when: {
             turning: function(event, page, view) {
-                // Load the required pages
-                const range = $(this).turn('range', page);
-                for (let i = range[0]; i <= range[1]; i++) {
-                    renderPage(i);
-                }
+                pageNum = page;
+                pageNumDisplay.textContent = page;
+                renderPage(page);
+                
+                // إظهار تأثير الظل عند تقليب الصفحة
+                pageTurnShadow.style.opacity = '1';
+                setTimeout(() => {
+                    pageTurnShadow.style.opacity = '0';
+                }, 500);
+                
+                // تحميل الصفحات المجاورة مسبقًا
+                if (page > 1) renderPage(page - 1);
+                if (page < pdfDoc.numPages) renderPage(page + 1);
             },
             turned: function(event, page, view) {
-                // Load the visible pages
-                for (let i = 0; i < view.length; i++) {
-                    if (view[i] > 0) {
-                        renderPage(view[i]);
-                    }
-                }
+                // تحديث رقم الصفحة الحالية
+                pageNum = page;
+                pageNumDisplay.textContent = page;
             }
         }
     });
     
-    // Render initial pages
-    renderPage(1);
-    if (pageCount > 1) {
-        renderPage(2);
-    }
-    
-    // Handle window resize
-    window.addEventListener('resize', function() {
-        $(flipbook).turn('size', flipbook.clientWidth, flipbook.clientHeight);
-    });
-    
-    // Navigation buttons
-    document.getElementById('prev').addEventListener('click', function() {
-        $(flipbook).turn('previous');
-    });
-    
-    document.getElementById('next').addEventListener('click', function() {
-        $(flipbook).turn('next');
-    });
-    
-    // Keyboard navigation
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'ArrowLeft') {
-            $(flipbook).turn('next');
-        } else if (e.key === 'ArrowRight') {
-            $(flipbook).turn('previous');
-        }
+    // تحسين مظهر الصفحات
+    $(flipbook).css({
+        'transform-style': 'preserve-3d',
+        'perspective': '2000px'
     });
 }
 
-function renderPage(pageNumber) {
-    if (!pdfDoc || pageNumber > pageCount) return;
+// عرض صفحة محددة
+function renderPage(num) {
+    if (!pdfDoc || num < 1 || num > pdfDoc.numPages) return;
     
-    const pageDiv = document.querySelector(`.page[data-page-number="${pageNumber}"]`);
-    if (pageDiv && !pageDiv.hasAttribute('data-rendered')) {
-        pageDiv.setAttribute('data-rendered', 'true');
+    const canvas = document.getElementById('page-' + num);
+    if (!canvas || canvas.hasAttribute('data-rendered')) return;
+    
+    pageRendering = true;
+    
+    // الحصول على الصفحة
+    pdfDoc.getPage(num).then(function(page) {
+        const ctx = canvas.getContext('2d');
         
-        pdfDoc.getPage(pageNumber).then(function(page) {
-            const viewport = page.getViewport({ scale: 1 });
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
+        // حساب المقياس لملاءمة الصفحة في الحاوية
+        const viewport = page.getViewport({scale: 1});
+        const parent = canvas.parentElement;
+        const containerWidth = parent.clientWidth;
+        const containerHeight = parent.clientHeight;
+        
+        const scaleX = containerWidth / viewport.width;
+        const scaleY = containerHeight / viewport.height;
+        const scaleFactor = Math.min(scaleX, scaleY) * 0.95; // 95% من الحاوية
+        
+        const scaledViewport = page.getViewport({scale: scaleFactor});
+        
+        // تعيين أبعاد canvas
+        canvas.width = scaledViewport.width;
+        canvas.height = scaledViewport.height;
+        
+        // عرض الصفحة
+        const renderContext = {
+            canvasContext: ctx,
+            viewport: scaledViewport
+        };
+        
+        page.render(renderContext).promise.then(function() {
+            pageRendering = false;
+            canvas.setAttribute('data-rendered', 'true');
             
-            // Calculate scale to fit the page in the container
-            const containerWidth = pageDiv.clientWidth;
-            const containerHeight = pageDiv.clientHeight;
-            const scale = Math.min(
-                containerWidth / viewport.width,
-                containerHeight / viewport.height
-            );
-            
-            const scaledViewport = page.getViewport({ scale });
-            
-            canvas.width = scaledViewport.width;
-            canvas.height = scaledViewport.height;
-            
-            // Render the PDF page
-            page.render({
-                canvasContext: context,
-                viewport: scaledViewport
-            }).promise.then(function() {
-                // Add the rendered page to the DOM
-                pageDiv.style.backgroundImage = `url(${canvas.toDataURL()})`;
-            });
+            // التحقق مما إذا كانت هناك صفحة معلقة
+            if (pageNumPending !== null) {
+                renderPage(pageNumPending);
+                pageNumPending = null;
+            }
         });
-    }
+    });
 }
 
-// Start loading the PDF when the page is loaded
-document.addEventListener('DOMContentLoaded', loadPDF);
+// باقي الكود كما هو...
