@@ -1,64 +1,35 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>المجلة المدرسية - أحفاد نوفمبر</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dearflip@2.1.0/css/dflip.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/dearflip@2.1.0/js/dflip.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Cairo', sans-serif;
-      background-color: #f9f9f9;
-      direction: rtl;
-      text-align: center;
-    }
-
-    header {
-      padding: 20px;
-      background: linear-gradient(to right, #00416A, #E4E5E6);
-      color: white;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-
-    h2 {
-      margin: 5px 0;
-      font-size: 20px;
-      color: #f0f0f0;
-    }
-
-    .dflip-container {
-      margin: 30px auto;
-    }
-
-    .footer {
-      margin: 20px;
-      font-size: 14px;
-      color: #555;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متوسطة الشهداء رزيق - المجلة المدرسية</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <h1>متوسطة الشهداء رزيق</h1>
+            <h2>المجلة المدرسية - العدد الأول أفريل 2025</h2>
+            <h3>عنوان العدد : أحفاد نوفمبر</h3>
+        </div>
+        
+        <div class="flipbook-container">
+            <div id="flipbook"></div>
+            
+            <div class="controls">
+                <button id="prev" class="btn">الصفحة السابقة</button>
+                <button id="next" class="btn">الصفحة التالية</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>برمجة و تصميم الاستاذ حوض سيف الدين</p>
+        </div>
+    </div>
 
-  <header>
-    <h1>متوسطة الشهداء رزيق</h1>
-    <h2>المجلة المدرسية - العدد الأول أفريل 2025</h2>
-    <h2>أحفاد نوفمبر</h2>
-  </header>
-
-  <!-- flipbook -->
-  <div class="dflip-container" style="width: 80%; max-width: 900px;">
-    <div class="df-viewer" source="https://saif107.github.io/Cem_hlalat/2030.pdf" id="flipbook"></div>
-  </div>
-
-  <div class="footer">
-    برمجة و تصميم الأستاذ حوض سيف الدين
-  </div>
-
+    <script src="script.js"></script>
 </body>
 </html>
