@@ -2,56 +2,65 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>متوسطة الشهداء رزيق</title>
-  <script src="https://dearflip.com/wp-content/plugins/3d-flipbook-dflip/assets/js/dflip.min.js"></script>
-  <link rel="stylesheet" href="https://dearflip.com/wp-content/plugins/3d-flipbook-dflip/assets/css/dflip.min.css">
+  <title>المجلة المدرسية - أحفاد نوفمبر</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- تضمين مكتبة DearFlip -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dearflip@2.1.0/css/dflip.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/dearflip@2.1.0/js/dflip.min.js"></script>
+
   <style>
     body {
       margin: 0;
       font-family: 'Cairo', sans-serif;
-      background-color: #f4f4f4;
+      background-color: #f9f9f9;
       direction: rtl;
       text-align: center;
     }
+
+    header {
+      padding: 20px;
+      background: linear-gradient(to right, #00416A, #E4E5E6);
+      color: white;
+    }
+
     h1 {
-      margin-top: 20px;
-      color: #2c3e50;
+      margin: 0;
+      font-size: 28px;
     }
+
     h2 {
-      margin: 5px;
-      color: #7f8c8d;
+      margin: 5px 0;
+      font-size: 20px;
+      color: #f0f0f0;
     }
+
+    .dflip-container {
+      margin: 30px auto;
+    }
+
     .footer {
-      margin-top: 10px;
-      color: #555;
+      margin: 20px;
       font-size: 14px;
-    }
-    #flipbookContainer {
-      width: 80%;
-      max-width: 900px;
-      margin: 20px auto;
-      height: 600px;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <h1>متوسطة الشهداء رزيق</h1>
-  <h2>المجلة المدرسية - العدد الأول أفريل 2025</h2>
-  <h2>أحفاد نوفمبر</h2>
 
-  <!-- إضافة Flipbook باستخدام DearFlip -->
-  <div id="flipbookContainer">
-    <div class="df-flipbook" 
-         source="https://drive.google.com/uc?export=download&id=1pEmjkyxXDfajkFQfN0_TlOEVhnCmOxi8"
-         id="my-flipbook"
-         webgl="true"
-         backgroundcolor="#ffffff"
-         height="100%">
-    </div>
+  <header>
+    <h1>متوسطة الشهداء رزيق</h1>
+    <h2>المجلة المدرسية - العدد الأول أفريل 2025</h2>
+    <h2>أحفاد نوفمبر</h2>
+  </header>
+
+  <!-- flipbook -->
+  <div class="dflip-container" style="width: 80%; max-width: 900px;">
+    <div class="df-viewer" source="2030.pdf" id="flipbook"></div>
   </div>
 
   <div class="footer">
     برمجة و تصميم الأستاذ حوض سيف الدين
   </div>
+
 </body>
 </html>
