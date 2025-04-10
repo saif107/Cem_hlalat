@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Tajawal', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    direction: rtl;
+    color: #333;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.header h1 {
+    color: #1a237e;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.header h2 {
+    color: #303f9f;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.header h3 {
+    color: #5c6bc0;
+    font-size: 1.5rem;
+}
+
+.flipbook-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+#flipbook {
+    width: 100%;
+    height: 70vh;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.page {
+    background-color: white;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #303f9f;
+}
+
+.footer {
+    text-align: center;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.footer p {
+    color: #3f51b5;
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .header h3 {
+        font-size: 1.2rem;
+    }
+    
+    #flipbook {
+        height: 50vh;
+    }
+}
