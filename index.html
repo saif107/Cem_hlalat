@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متوسطة الشهداء رزيق - المجلة المدرسية</title>
     <link rel="stylesheet" href="style.css">
+    <!-- تحميل الخطوط العربية -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- تحميل المكتبات بالترتيب الصحيح -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
@@ -18,7 +23,7 @@
 
     <div class="container">
         <div class="header">
-            <h1>متوسطة الشهداء رزيق - برهوم 2</h1>
+            <h1>متوسطة الشهداء رزيق 3</h1>
             <h2>المجلة المدرسية - العدد الأول أفريل 2025</h2>
             <h3>عنوان العدد : أحفاد نوفمبر</h3>
         </div>
@@ -28,11 +33,11 @@
             <div class="page-turn-shadow"></div>
             
             <div class="controls">
-                <button id="prev" class="btn"><i class="fas fa-chevron-right"></i> الصفحة السابقة</button>
+                <button id="next" class="btn"><i class="fas fa-chevron-right"></i> الصفحة التالية</button>
                 <div class="page-indicator">
                     <span id="page-num">1</span> / <span id="page-count">0</span>
                 </div>
-                <button id="next" class="btn">الصفحة التالية <i class="fas fa-chevron-left"></i></button>
+                <button id="prev" class="btn">الصفحة السابقة <i class="fas fa-chevron-left"></i></button>
             </div>
         </div>
         
