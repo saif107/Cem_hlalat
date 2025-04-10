@@ -1,22 +1,40 @@
 // PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
 
-// PDF file path
-const pdfPath = '2030.pdf';
+// PDF file path - make sure this matches your file location exactly
+const pdfPath = './2030.pdf';
 let pdfDoc = null;
 let pageCount = 0;
 
-// Load the PDF
-pdfjsLib.getDocument(pdfPath).promise.then(function(pdf) {
-    pdfDoc = pdf;
-    pageCount = pdf.numPages;
+// Load the PDF with better error handling
+function loadPDF() {
+    console.log('Attempting to load PDF from:', pdfPath);
     
-    // Initialize the flipbook after loading the first page
-    initializeFlipbook();
-}).catch(function(error) {
-    console.error('Error loading PDF:', error);
-    alert('حدث خطأ أثناء تحميل ملف PDF. يرجى التأكد من وجود الملف في المسار الصحيح.');
-});
+    // Create a fetch request to check if the file exists
+    fetch(pdfPath)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
+            }
+            return response.arrayBuffer();
+        })
+        .then(arrayBuffer => {
+            return pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        })
+        .then(pdf => {
+            console.log('PDF loaded successfully');
+            pdfDoc = pdf;
+            pageCount = pdf.numPages;
+            console.log('Number of pages:', pageCount);
+            
+            // Initialize the flipbook after loading the PDF
+            initializeFlipbook();
+        })
+        .catch(error => {
+            console.error('Error loading PDF:', error);
+            alert('حدث خطأ أثناء تحميل ملف PDF: ' + error.message);
+        });
+}
 
 function initializeFlipbook() {
     const flipbook = document.getElementById('flipbook');
@@ -59,7 +77,9 @@ function initializeFlipbook() {
     
     // Render initial pages
     renderPage(1);
-    renderPage(2);
+    if (pageCount > 1) {
+        renderPage(2);
+    }
     
     // Handle window resize
     window.addEventListener('resize', function() {
@@ -121,3 +141,6 @@ function renderPage(pageNumber) {
         });
     }
 }
+
+// Start loading the PDF when the page is loaded
+document.addEventListener('DOMContentLoaded', loadPDF);
