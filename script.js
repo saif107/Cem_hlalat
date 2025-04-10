@@ -13,12 +13,22 @@ const pageCountDisplay = document.getElementById('page-count');
 const loadingOverlay = document.getElementById('loading-overlay');
 const pageTurnShadow = document.querySelector('.page-turn-shadow');
 
-// تحميل ملف PDF باستخدام طريقة تمنع التنزيل المباشر
+// تحميل ملف PDF من Google Drive
 function loadPDF() {
-    console.log('بدء محاولة تحميل PDF...');
+    console.log('بدء تحميل PDF من Google Drive...');
     
-    // استخدام fetch API مع responseType مضبوط على 'blob'
-    fetch('2030.pdf')
+    // رابط Google Drive للمشاركة المباشرة (يجب تغييره إلى رابط المجلة الخاصة بك)
+    // هذا مثال فقط، استبدله برابط المجلة الخاصة بك
+    const googleDriveFileID = 'YOUR_FILE_ID';
+    const pdfUrl = `https://drive.google.com/uc?export=download&id=${googleDriveFileID}`;
+    
+    // يمكنك أيضًا استخدام الملف المحلي إذا كان متاحًا
+    const localPdfUrl = '2030.pdf';
+    
+    // اختيار المصدر (Google Drive أو محلي)
+    const selectedUrl = localPdfUrl; // غيّر هذا إلى pdfUrl لاستخدام Google Drive
+    
+    fetch(selectedUrl)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`فشل في جلب الملف: ${response.status} ${response.statusText}`);
@@ -70,8 +80,6 @@ function loadPDF() {
         })
         .catch(error => {
             console.error('خطأ في تحميل الملف:', error);
-            
-            // محاولة بديلة باستخدام XMLHttpRequest
             fallbackLoadPDF();
         });
 }
@@ -172,6 +180,7 @@ function initTurn() {
         elevation: 50,
         gradients: true,
         duration: 1000, // مدة أطول للتأثير
+        direction: 'rtl', // تغيير اتجاه الكتاب للعربية (من اليمين إلى اليسار)
         when: {
             turning: function(event, page, view) {
                 pageNum = page;
@@ -289,12 +298,12 @@ window.addEventListener('resize', function() {
 
 // إضافة دعم لوحة المفاتيح
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'ArrowLeft') {
+    if (e.key === 'ArrowRight') { // تغيير من ArrowLeft إلى ArrowRight للعربية
         if (pageNum < pdfDoc.numPages) {
             pageNum++;
             $(flipbook).turn('next');
         }
-    } else if (e.key === 'ArrowRight') {
+    } else if (e.key === 'ArrowLeft') { // تغيير من ArrowRight إلى ArrowLeft للعربية
         if (pageNum > 1) {
             pageNum--;
             $(flipbook).turn('previous');
