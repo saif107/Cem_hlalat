@@ -1,1 +1,5 @@
-
+<Files "2030.pdf">
+    ForceType application/octet-stream
+    Header set Content-Disposition "inline"
+    Header set X-Content-Type-Options "nosniff"
+</Files>
