@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Cairo:wght@400;700&display=swap');
 
 * {
     margin: 0;
@@ -7,7 +7,7 @@
 }
 
 body {
-    font-family: 'Tajawal', sans-serif;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
     background: linear-gradient(135deg, #1e5799 0%, #207cca 37%, #2989d8 69%, #7db9e8 100%);
     min-height: 100vh;
     display: flex;
@@ -16,6 +16,7 @@ body {
     direction: rtl;
     color: #333;
     padding: 20px;
+    text-align: right;
 }
 
 .container {
@@ -59,18 +60,21 @@ body {
     margin-bottom: 15px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     font-weight: 700;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 
 .header h2 {
     font-size: 1.8rem;
     margin-bottom: 10px;
     font-weight: 500;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 
 .header h3 {
     font-size: 1.5rem;
     font-weight: 400;
     color: #ffeb3b;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 
 .flipbook-container {
@@ -92,6 +96,7 @@ body {
     background-color: #fff;
     border-radius: 5px;
     overflow: hidden;
+    direction: rtl; /* تأكيد اتجاه RTL للكتاب */
 }
 
 .page {
@@ -128,7 +133,7 @@ body {
     border: none;
     border-radius: 30px;
     cursor: pointer;
-    font-family: 'Tajawal', sans-serif;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
     font-size: 1.1rem;
     transition: all 0.3s;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
@@ -152,6 +157,7 @@ body {
     padding: 5px 15px;
     border-radius: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 
 .footer {
@@ -182,6 +188,7 @@ body {
     font-size: 1.2rem;
     position: relative;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 
 .loading-overlay {
@@ -198,6 +205,7 @@ body {
     color: white;
     font-size: 1.5rem;
     transition: opacity 0.5s;
+    font-family: 'Cairo', 'Tajawal', sans-serif;
 }
 
 .spinner {
@@ -224,6 +232,15 @@ body {
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s;
+}
+
+/* تحسين أداء التحميل */
+img, canvas {
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+    -ms-interpolation-mode: nearest-neighbor;
 }
 
 @media (max-width: 768px) {
