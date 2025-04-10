@@ -13,129 +13,134 @@ const pageCountDisplay = document.getElementById('page-count');
 const loadingOverlay = document.getElementById('loading-overlay');
 const pageTurnShadow = document.querySelector('.page-turn-shadow');
 
-// تحميل ملف PDF باستخدام طرق متعددة للتوافق مع مختلف الأجهزة
+// تحميل ملف PDF باستخدام طريقة تمنع التنزيل المباشر
 function loadPDF() {
     console.log('بدء محاولة تحميل PDF...');
     
-    // محاولة تحميل الملف باستخدام fetch أولاً (أكثر توافقًا مع المتصفحات الحديثة)
+    // استخدام fetch API مع responseType مضبوط على 'blob'
     fetch('2030.pdf')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`فشل في جلب الملف: ${response.status} ${response.statusText}`);
             }
-            console.log('تم جلب الملف بنجاح باستخدام fetch');
-            return response.arrayBuffer();
+            return response.blob();
         })
-        .then(arrayBuffer => {
-            processPdfData(arrayBuffer);
+        .then(blob => {
+            // تحويل Blob إلى ArrayBuffer
+            const fileReader = new FileReader();
+            fileReader.onload = function() {
+                const arrayBuffer = this.result;
+                
+                // تحميل PDF باستخدام PDF.js
+                pdfjsLib.getDocument({data: arrayBuffer}).promise
+                    .then(function(pdf) {
+                        console.log('تم تحميل ملف PDF بنجاح');
+                        pdfDoc = pdf;
+                        pageCountDisplay.textContent = pdf.numPages;
+                        
+                        // إنشاء صفحات للكتاب
+                        createPages(pdf.numPages);
+                        
+                        // تهيئة turn.js
+                        initTurn();
+                        
+                        // عرض الصفحة الأولى
+                        renderPage(1);
+                        if (pdf.numPages > 1) {
+                            renderPage(2);
+                        }
+                        
+                        // إخفاء شاشة التحميل
+                        setTimeout(() => {
+                            loadingOverlay.style.opacity = '0';
+                            setTimeout(() => {
+                                loadingOverlay.style.display = 'none';
+                            }, 500);
+                        }, 1000);
+                    })
+                    .catch(function(error) {
+                        console.error('خطأ في تحميل PDF باستخدام PDF.js:', error);
+                        alert('خطأ في تحميل ملف PDF: ' + error.message);
+                        loadingOverlay.style.display = 'none';
+                    });
+            };
+            
+            // قراءة Blob كـ ArrayBuffer
+            fileReader.readAsArrayBuffer(blob);
         })
         .catch(error => {
-            console.warn('فشل تحميل PDF باستخدام fetch، جاري المحاولة بطريقة أخرى:', error);
+            console.error('خطأ في تحميل الملف:', error);
             
-            // محاولة ثانية باستخدام XMLHttpRequest
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', '2030.pdf', true);
-            xhr.responseType = 'arraybuffer';
-            
-            xhr.onload = function() {
-                if (this.status === 200) {
-                    console.log('تم تحميل الملف بنجاح باستخدام XMLHttpRequest');
-                    processPdfData(this.response);
-                } else {
-                    console.error('فشل في تحميل PDF باستخدام XMLHttpRequest:', this.status, this.statusText);
-                    
-                    // محاولة ثالثة باستخدام مسار مطلق
-                    tryAlternativePaths();
-                }
-            };
-            
-            xhr.onerror = function() {
-                console.error('خطأ في الشبكة أثناء تحميل PDF باستخدام XMLHttpRequest');
-                tryAlternativePaths();
-            };
-            
-            xhr.send();
+            // محاولة بديلة باستخدام XMLHttpRequest
+            fallbackLoadPDF();
         });
 }
 
-// محاولة تحميل الملف من مسارات بديلة
-function tryAlternativePaths() {
-    console.log('محاولة تحميل الملف من مسارات بديلة...');
+// طريقة بديلة لتحميل PDF في حالة فشل fetch
+function fallbackLoadPDF() {
+    console.log('استخدام طريقة بديلة لتحميل PDF...');
     
-    // قائمة بالمسارات البديلة المحتملة
-    const alternativePaths = [
-        './2030.pdf',
-        '../2030.pdf',
-        '/2030.pdf',
-        'file:///c:/Users/SiFO-PC/Desktop/مشروع/2030.pdf',
-        window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + '2030.pdf'
-    ];
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '2030.pdf', true);
+    xhr.responseType = 'blob';
     
-    // محاولة تحميل الملف من كل مسار بديل
-    tryNextPath(alternativePaths, 0);
-}
-
-// محاولة تحميل الملف من المسار التالي في القائمة
-function tryNextPath(paths, index) {
-    if (index >= paths.length) {
-        // فشلت جميع المحاولات
-        console.error('فشلت جميع محاولات تحميل الملف');
-        alert('فشل في تحميل ملف PDF. الرجاء التأكد من وجود الملف في المسار الصحيح.');
-        loadingOverlay.style.display = 'none';
-        return;
-    }
-    
-    console.log('محاولة تحميل الملف من المسار:', paths[index]);
-    
-    fetch(paths[index])
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`فشل في جلب الملف: ${response.status} ${response.statusText}`);
-            }
-            console.log('تم جلب الملف بنجاح من المسار البديل:', paths[index]);
-            return response.arrayBuffer();
-        })
-        .then(arrayBuffer => {
-            processPdfData(arrayBuffer);
-        })
-        .catch(error => {
-            console.warn(`فشل تحميل PDF من المسار ${paths[index]}:`, error);
-            // محاولة المسار التالي
-            tryNextPath(paths, index + 1);
-        });
-}
-
-// معالجة بيانات PDF بعد تحميلها بنجاح
-function processPdfData(arrayBuffer) {
-    // تحميل PDF باستخدام PDF.js
-    pdfjsLib.getDocument({data: arrayBuffer}).promise
-        .then(function(pdf) {
-            console.log('تم تحميل ملف PDF بنجاح');
-            pdfDoc = pdf;
-            pageCountDisplay.textContent = pdf.numPages;
+    xhr.onload = function() {
+        if (this.status === 200) {
+            const blob = this.response;
+            const fileReader = new FileReader();
             
-            // إنشاء صفحات للكتاب
-            createPages(pdf.numPages);
+            fileReader.onload = function() {
+                const arrayBuffer = this.result;
+                
+                // تحميل PDF باستخدام PDF.js
+                pdfjsLib.getDocument({data: arrayBuffer}).promise
+                    .then(function(pdf) {
+                        console.log('تم تحميل ملف PDF بنجاح باستخدام الطريقة البديلة');
+                        pdfDoc = pdf;
+                        pageCountDisplay.textContent = pdf.numPages;
+                        
+                        // إنشاء صفحات للكتاب
+                        createPages(pdf.numPages);
+                        
+                        // تهيئة turn.js
+                        initTurn();
+                        
+                        // عرض الصفحة الأولى
+                        renderPage(1);
+                        if (pdf.numPages > 1) {
+                            renderPage(2);
+                        }
+                        
+                        // إخفاء شاشة التحميل
+                        setTimeout(() => {
+                            loadingOverlay.style.opacity = '0';
+                            setTimeout(() => {
+                                loadingOverlay.style.display = 'none';
+                            }, 500);
+                        }, 1000);
+                    })
+                    .catch(function(error) {
+                        console.error('خطأ في تحميل PDF باستخدام PDF.js:', error);
+                        alert('خطأ في تحميل ملف PDF: ' + error.message);
+                        loadingOverlay.style.display = 'none';
+                    });
+            };
             
-            // تهيئة turn.js
-            initTurn();
-            
-            // عرض الصفحة الأولى
-            renderPage(1);
-            
-            // إخفاء شاشة التحميل
-            setTimeout(() => {
-                loadingOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                }, 500);
-            }, 1000);
-        })
-        .catch(function(error) {
-            console.error('خطأ في تحميل PDF باستخدام PDF.js:', error);
-            alert('خطأ في تحميل ملف PDF: ' + error.message);
+            fileReader.readAsArrayBuffer(blob);
+        } else {
+            console.error('فشل في تحميل PDF:', this.status, this.statusText);
+            alert('فشل في تحميل ملف PDF. الرجاء التأكد من وجود الملف في المسار الصحيح.');
             loadingOverlay.style.display = 'none';
-        });
+        }
+    };
+    
+    xhr.onerror = function() {
+        console.error('خطأ في الشبكة أثناء تحميل PDF');
+        alert('خطأ في الشبكة أثناء تحميل ملف PDF');
+        loadingOverlay.style.display = 'none';
+    };
+    
+    xhr.send();
 }
 
 // إنشاء صفحات للكتاب
@@ -162,7 +167,7 @@ function initTurn() {
         width: flipbook.clientWidth,
         height: flipbook.clientHeight,
         autoCenter: true,
-        display: 'double', // تغيير إلى عرض صفحتين
+        display: 'double', // عرض صفحتين
         acceleration: true,
         elevation: 50,
         gradients: true,
@@ -246,4 +251,63 @@ function renderPage(num) {
     });
 }
 
-// باقي الكود كما هو...
+// زر الصفحة السابقة
+document.getElementById('prev').addEventListener('click', function() {
+    if (pageNum <= 1) return;
+    
+    // إضافة تأثير نقر للزر
+    this.classList.add('active');
+    setTimeout(() => this.classList.remove('active'), 200);
+    
+    pageNum--;
+    $(flipbook).turn('previous');
+});
+
+// زر الصفحة التالية
+document.getElementById('next').addEventListener('click', function() {
+    if (pageNum >= pdfDoc.numPages) return;
+    
+    // إضافة تأثير نقر للزر
+    this.classList.add('active');
+    setTimeout(() => this.classList.remove('active'), 200);
+    
+    pageNum++;
+    $(flipbook).turn('next');
+});
+
+// التعامل مع تغيير حجم النافذة
+window.addEventListener('resize', function() {
+    if (flipbook) {
+        $(flipbook).turn('size', flipbook.clientWidth, flipbook.clientHeight);
+        
+        // إعادة عرض الصفحات الحالية بعد تغيير الحجم
+        renderPage(pageNum);
+        if (pageNum > 1) renderPage(pageNum - 1);
+        if (pageNum < pdfDoc.numPages) renderPage(pageNum + 1);
+    }
+});
+
+// إضافة دعم لوحة المفاتيح
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowLeft') {
+        if (pageNum < pdfDoc.numPages) {
+            pageNum++;
+            $(flipbook).turn('next');
+        }
+    } else if (e.key === 'ArrowRight') {
+        if (pageNum > 1) {
+            pageNum--;
+            $(flipbook).turn('previous');
+        }
+    }
+});
+
+// بدء التحميل عندما تكون الصفحة جاهزة
+document.addEventListener('DOMContentLoaded', function() {
+    // إظهار شاشة التحميل
+    loadingOverlay.style.display = 'flex';
+    loadingOverlay.style.opacity = '1';
+    
+    // تحميل PDF
+    loadPDF();
+});
