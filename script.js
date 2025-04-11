@@ -23,7 +23,7 @@ function loadPDF() {
     const pdfUrl = `https://drive.google.com/uc?export=download&id=${googleDriveFileID}`;
     
     // يمكنك أيضًا استخدام الملف المحلي إذا كان متاحًا
-    const localPdfUrl = '2030.pdf';
+    const localPdfUrl = '2025.pdf';
     
     // اختيار المصدر (Google Drive أو محلي)
     const selectedUrl = localPdfUrl; // غيّر هذا إلى pdfUrl لاستخدام Google Drive
@@ -180,7 +180,7 @@ function initTurn() {
         elevation: 50,
         gradients: true,
         duration: 1000, // مدة أطول للتأثير
-        direction: 'rtl', // تغيير اتجاه الكتاب للعربية (من اليمين إلى اليسار)
+        direction: 'ltr', // تغيير اتجاه الكتاب للعربية (من اليمين إلى اليسار)
         when: {
             turning: function(event, page, view) {
                 pageNum = page;
