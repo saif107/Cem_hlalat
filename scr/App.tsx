@@ -4,9 +4,12 @@ import { Book } from 'lucide-react';
 
 function App() {
   const viewer = useRef<HTMLDivElement>(null);
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
-    if (!viewer.current) return;
+    if (!viewer.current || hasInitialized.current) return;
+    
+    hasInitialized.current = true;
 
     WebViewer(
       {
