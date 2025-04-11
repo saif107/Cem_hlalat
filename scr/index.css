@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  font-family: 'Noto Naskh Arabic', serif;
+  --font-primary: 'Amiri', 'Cairo', 'Tajawal', sans-serif;
 }
 
 .rtl {
@@ -13,8 +13,91 @@
 body {
   margin: 0;
   min-height: 100vh;
+  background: linear-gradient(135deg, #f6f9fc 0%, #edf2f7 100%);
+  font-family: var(--font-primary);
 }
 
 #root {
   min-height: 100vh;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.page-title {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-primary);
+}
+
+.viewer-container {
+  background: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+}
+
+.viewer-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.2);
+}
+
+.loading-overlay {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+/* تحسين عرض النص العربي */
+.page {
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+  direction: rtl;
+  text-align: right;
+}
+
+.page canvas {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  direction: rtl;
+}
+
+/* تحسين أداء عرض النص العربي */
+.page-text-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  opacity: 0.2;
+  line-height: 1.0;
+  direction: rtl;
+  text-align: right;
+}
+
+.page-text-layer > span {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+  direction: rtl;
+  font-family: var(--font-primary);
 }
